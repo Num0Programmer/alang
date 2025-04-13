@@ -2,6 +2,7 @@ data $_zero = { w 0 }
 data $argc_fmt = { b "Number of arguments = %u\n", b 0 }
 data $argi_fmt = { b "%d = ", b 0 }
 data $ch_fmt = { b "%c", b 0 }
+data $nl_fmt = { b "\n", b 0 }
 
 
 export function w $main(w %argc, l %argv) {
@@ -15,11 +16,16 @@ export function w $main(w %argc, l %argv) {
 @print_chars
     %ch =w loadub %arg
     %cmp =w ceqw %ch, 0  # check is end of string
-    jnz %cmp, @exit, @print_byte
+    jnz %cmp, @next_arg, @print_byte
 @print_byte
     call $printf(l $ch_fmt, ..., w %ch)
     %arg =l add %arg, 1
     jmp @print_chars
+@next_arg
+    call $printf(l $nl_fmt, ...)
+    %i =w add %i, 1
+    %cmp =w cultw %i, %argc
+    jnz %cmp, @print_arg, @exit
 
 @exit
     ret 0
