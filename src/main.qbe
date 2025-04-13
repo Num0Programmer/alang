@@ -1,6 +1,6 @@
 data $_zero = { l 0 }
 data $argc_fmt = { b "Number of arguments = %u\n", b 0 }
-data $argi_fmt = { b "%u = ", b 0 }
+data $argi_fmt = { b "Arg #%u = ", b 0 }
 data $ch_fmt = { b "%c", b 0 }
 data $nl_fmt = { b "\n", b 0 }
 
@@ -24,7 +24,7 @@ export function w $main(l %argc, l %argv) {
 @next_arg
     call $printf(l $nl_fmt)
     %i =l add %i, 1
-    %argv =l add %argv, 8
+    %argv =l add %argv, 8  # move pointer 8 bytes - size of point on 64-bit arch
     %cmp =w cultl %i, %argc
     jnz %cmp, @print_arg, @exit
 
