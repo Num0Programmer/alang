@@ -1,18 +1,18 @@
-data $_zero = { w 0 }
+data $_zero = { l 0 }
 data $argc_fmt = { b "Number of arguments = %u\n", b 0 }
-data $argi_fmt = { b "%d = ", b 0 }
+data $argi_fmt = { b "%u = ", b 0 }
 data $ch_fmt = { b "%c", b 0 }
 data $nl_fmt = { b "\n", b 0 }
 
 
-export function w $main(w %argc, l %argv) {
+export function w $main(l %argc, l %argv) {
 @start
-    call $printf(l $argc_fmt, ..., w %argc)
+    call $printf(l $argc_fmt, ..., l %argc)
 
-    %i =w loadw $_zero
+    %i =l loadl $_zero
 @print_arg
     %arg =l loadl %argv
-    call $printf(l $argi_fmt, ..., w %i)
+    call $printf(l $argi_fmt, ..., l %i)
 @print_chars
     %ch =w loadub %arg
     %cmp =w ceqw %ch, 0  # check is end of string
@@ -22,9 +22,10 @@ export function w $main(w %argc, l %argv) {
     %arg =l add %arg, 1
     jmp @print_chars
 @next_arg
-    call $printf(l $nl_fmt, ...)
-    %i =w add %i, 1
-    %cmp =w cultw %i, %argc
+    call $printf(l $nl_fmt)
+    %i =l add %i, 1
+    %argv =l add %argv, 8
+    %cmp =w cultl %i, %argc
     jnz %cmp, @print_arg, @exit
 
 @exit
