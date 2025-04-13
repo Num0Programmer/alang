@@ -1,4 +1,3 @@
-data $_zero = { l 0 }
 data $argc_fmt = { b "Number of arguments = %u\n", b 0 }
 data $argi_fmt = { b "Arg #%u = ", b 0 }
 data $ch_fmt = { b "%c", b 0 }
@@ -9,7 +8,7 @@ export function w $main(l %argc, l %argv) {
 @start
     call $printf(l $argc_fmt, ..., l %argc)
 
-    %i =l loadl $_zero
+    %i =l copy 0
 @print_arg
     %arg =l loadl %argv
     call $printf(l $argi_fmt, ..., l %i)
