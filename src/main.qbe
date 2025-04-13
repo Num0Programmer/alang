@@ -24,7 +24,7 @@ export function w $main(l %argc, l %argv) {
 @next_arg
     call $printf(l $nl_fmt)
     %i =l add %i, 1
-    %argv =l add %argv, 8  # move pointer 8 bytes - size of point on 64-bit arch
+    %argv =l add %argv, 8  # move pointer 8 bytes - size of pointer on 64-bit arch
     %cmp =w cultl %i, %argc
     jnz %cmp, @print_arg, @exit
 
