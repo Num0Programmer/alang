@@ -1,14 +1,13 @@
-data $argc_fmt = { b "Number of arguments = %u; maximum length of file names = %u\n", b 0 }
+data $argc_fmt = { b "Number of arguments = %u\n", b 0 }
 data $argi_fmt = { b "Arg #%u = ", b 0 }
 data $ch_fmt = { b "%c", b 0 }
 data $nl_fmt = { b "\n", b 0 }
-data $max_file_name_len = { w 64, b 0 }
 
 
 export function w $main(l %argc, l %argv) {
 @start
-    %max_file_name_len =w loadw $max_file_name_len
-    call $printf(l $argc_fmt, ..., l %argc, w %max_file_name_len)
+    %file_name =l alloc4 16  # allocates 64 bytes for a file name
+    call $printf(l $argc_fmt, ..., l %argc)
 
     %i =l copy 0
 @print_arg
