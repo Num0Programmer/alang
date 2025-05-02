@@ -1,4 +1,5 @@
 data $argc_fmt = { b "\nNumber of arguments = %u\n\n", b 0 }
+data $file_name_fmt = { b "File name = %s\n\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 
@@ -7,13 +8,8 @@ export function w $main(l %argc, l %argv) {
 @start
     call $printf(l $argc_fmt, ..., l %argc)
     %argv =l add %argv, 8
-    %fh =l call $fopen(l %argv, l $read_mode)
-    jnz %fh, @fopen_success, @fopen_fail
-@fopen_success
-    jmp @exit
-@fopen_fail
-    call $printf(l $err_open_file, ...)
+    %file_name =l loadl %argv
+    call $printf(l $file_name_fmt, ..., l %file_name)
 @exit
-    # call $fclose(l %fh)
     ret 0
 }
