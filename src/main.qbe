@@ -1,7 +1,25 @@
 data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
-data $file_name_fmt = { b "File name = %s\n\n", b 0 }
+data $file_name_fmt = { b "File name = %s\n", b 0 }
+data $file_size_fmt = { b "File size = %u bytes\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
+
+
+function w $parse_file(l %fh) {
+@start
+    %file_size =w copy 0
+@get_file_size
+    %ch =w call $fgetc(l %fh)
+    %cond =w cslew %ch, 0
+    jnz %cond, @end_get_file_size, @inc_nbytes
+@inc_nbytes
+    %file_size =w add %file_size, 1
+    jmp @get_file_size
+@end_get_file_size
+    call $printf(l $file_size_fmt, ..., w %file_size)
+@exit
+    ret 0
+}
 
 
 export function w $main(l %argc, l %argv) {
@@ -13,7 +31,7 @@ export function w $main(l %argc, l %argv) {
     %fh =l call $fopen(l %file_name, l $read_mode)
     jnz %fh, @fopen_success, @fopen_failure
 @fopen_success
-    # process file
+    call $parse_file(l %fh)
     call $fclose(l %fh)
     jmp @exit
 @fopen_failure
