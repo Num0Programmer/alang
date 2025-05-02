@@ -1,4 +1,4 @@
-data $argc_fmt = { b "\nNumber of arguments = %u\n\n", b 0 }
+data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
 data $file_name_fmt = { b "File name = %s\n\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
