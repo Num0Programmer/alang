@@ -10,6 +10,14 @@ export function w $main(l %argc, l %argv) {
     %argv =l add %argv, 8
     %file_name =l loadl %argv
     call $printf(l $file_name_fmt, ..., l %file_name)
+    %fh =l call $fopen(l %file_name, l $read_mode)
+    jnz %fh, @fopen_success, @fopen_failure
+@fopen_success
+    # process file
+    call $fclose(l %fh)
+    jmp @exit
+@fopen_failure
+    call $printf(l $err_open_file, ...)
 @exit
     ret 0
 }
