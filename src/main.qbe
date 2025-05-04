@@ -1,29 +1,35 @@
 data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
 data $file_name_fmt = { b "File name = %s\n", b 0 }
 data $file_size_fmt = { b "File size = %lu bytes\n", b 0 }
+data $sscan_fmt = { b "%s", b 0 }
+data $file_contents_fmt = { b "File contents (# of bytes=%lu) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 
 
-function l $get_file_len(l %fh) {
+function l $get_token(l %buffer, l %size, l %capacity, l %fh)
+{
 @start
-    %nbytes =l copy 0
-@get_file_size
+    %len =l copy 0
+@get_char
     %ch =w call $fgetc(l %fh)
-    %cond =w cslew %ch, 0
-    jnz %cond, @exit, @inc_nbytes
-@inc_nbytes
-    %nbytes =l add %nbytes, 1
-    jmp @get_file_size
+    %cmp_res =w ceqw %ch, 32  # compare with ASCII value for space character
+    jnz %cmp_res, @exit, @add_ch
+@add_ch
+    storeb %ch, %buffer
+    %len =l add %len, 1
+    %buffer =l add %buffer, 1
+    jmp @get_char
 @exit
-    ret %nbytes
+    ret %len
 }
 
 
 function w $parse_file(l %fh) {
 @start
-    %file_size =l call $get_file_len(l %fh)
-    call $printf(l $file_size_fmt, ..., l %file_size)
+    %contents =l alloc1 32
+    %len =l call $get_token(l %contents, l 1, l 32, l %fh)
+    call $printf(l $file_contents_fmt, ..., w %len, l %contents)
 @exit
     ret 0
 }
