@@ -29,8 +29,13 @@ function l $get_token(l %buffer, l %size, l %capacity, l %fh)
 function w $parse_file(l %fh) {
 @start
     %token =l alloc1 33
+@tokenize
     %len =l call $get_token(l %token, l 1, l 33, l %fh)
+    %cmp_res =w ceqw %len, 0
+    jnz %cmp_res, @exit, @print_token
+@print_token
     call $printf(l $file_token_fmt, ..., w %len, l %token)
+    jmp @tokenize
 @exit
     ret 0
 }
