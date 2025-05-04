@@ -2,7 +2,7 @@ data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
 data $file_name_fmt = { b "File name = %s\n", b 0 }
 data $file_size_fmt = { b "File size = %lu bytes\n", b 0 }
 data $ch_fmt = { b "character = %c\n", b 0 }
-data $file_contents_fmt = { b "File contents (# of bytes=%lu) = %s\n", b 0 }
+data $file_token_fmt = { b "File token (len=%lu) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 
@@ -28,11 +28,9 @@ function l $get_token(l %buffer, l %size, l %capacity, l %fh)
 
 function w $parse_file(l %fh) {
 @start
-    %contents =l alloc1 33
-    %len =l call $get_token(l %contents, l 1, l 33, l %fh)
-    call $printf(l $file_contents_fmt, ..., w %len, l %contents)
-    %ch =w loadub %contents
-    call $printf(l $ch_fmt, ..., w %ch)
+    %token =l alloc1 33
+    %len =l call $get_token(l %token, l 1, l 33, l %fh)
+    call $printf(l $file_token_fmt, ..., w %len, l %token)
 @exit
     ret 0
 }
