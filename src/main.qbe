@@ -5,16 +5,25 @@ data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
 # data types and operation defs
-data $num_literal_t = { b 35, b 0 }  # pound (#)
-data $str_literal_t = { b 34, b 0 }  # double quote (")
-data $ch_literal_t = { b 39, b 0 }   # single quote (')
+data $num_literal_dtype = { b 35, b 0 }  # pound (#) - real number
+data $func = { b 64, b 0 }  # commat (@)
+data $add_op = { b 43, b 0 }
+data $sub_op = { b 45, b 0 }
+data $mul_op = { b 42, b 0 }
+data $div_op = { b 47, b 0 }
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
 {
 @start
     %_capacity =l sub %capacity, 1
+    %_num_lit_dtype =w loadub $num_literal_dtype
+    %_func_dtype =w loadub $func_dtype
+    %_arith_op_dtype =w loadub $arith
     %len =l copy 0
+@read_dtype
+    %ch =w call $fgetc(l %fh)
+    %is_num =w ceqw %ch, 
 @get_char
     %ch =w call $fgetc(l %fh)
     %ch_cmp_res1 =w culew %ch, 32  # compare with ASCII value for space character
