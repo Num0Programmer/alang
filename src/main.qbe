@@ -5,7 +5,7 @@ data $ch_fmt = { b "character = %c; code = %u\n", b 0 }
 data $file_token_fmt = { b "File token (len=%lu) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
-data $max_token_len = { l 9, b 0 }  # extra byte for null terminator
+data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
 
 
 function l $get_token(l %buffer, l %capacity, l %fh)
