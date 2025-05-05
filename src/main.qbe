@@ -38,8 +38,8 @@ function w $parse_file(l %fh) {
 @tokenize
     %len =l call $get_token(l %token, l %_max_token_len, l %fh)
     %cmp_res =w ceqw %len, 0
-    jnz %cmp_res, @exit, @print_token
-@print_token
+    jnz %cmp_res, @exit, @process_token
+@process_token
     call $printf(l $file_token_fmt, ..., w %len, l %token)
     jmp @tokenize
 @exit
