@@ -5,11 +5,13 @@ data $ch_fmt = { b "character = %c; code = %u\n", b 0 }
 data $file_token_fmt = { b "File token (len=%lu) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
+data $max_token_len = { l 9, b 0 }  # extra byte for null terminator
 
 
 function l $get_token(l %buffer, l %capacity, l %fh)
 {
 @start
+    %_capacity =l sub %capacity, 1
     %len =l copy 0
 @get_char
     %ch =w call $fgetc(l %fh)
@@ -21,7 +23,8 @@ function l $get_token(l %buffer, l %capacity, l %fh)
     storeb %ch, %buffer
     %len =l add %len, 1
     %buffer =l add %buffer, 1
-    jmp @get_char
+    %at_cap =w ceql %len, %_capacity
+    jnz %at_cap, @exit, @get_char
 @exit
     storeb 0, %buffer
     ret %len
@@ -30,9 +33,10 @@ function l $get_token(l %buffer, l %capacity, l %fh)
 
 function w $parse_file(l %fh) {
 @start
-    %token =l alloc1 33
+    %_max_token_len =l loadl $max_token_len
+    %token =l alloc1 %_max_token_len
 @tokenize
-    %len =l call $get_token(l %token, l 33, l %fh)
+    %len =l call $get_token(l %token, l %_max_token_len, l %fh)
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @exit, @print_token
 @print_token
