@@ -19,7 +19,6 @@ function l $get_token(l %buffer, l %capacity, l %fh)
     jnz %ch_total_res, @exit, @add_ch
 @add_ch
     storeb %ch, %buffer
-    call $printf(l $ch_fmt, ..., w %ch, w %ch)
     %len =l add %len, 1
     %buffer =l add %buffer, 1
     jmp @get_char
