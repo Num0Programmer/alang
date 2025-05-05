@@ -1,6 +1,6 @@
 data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
 data $file_name_fmt = { b "File name = %s\n\n", b 0 }
-data $file_token_fmt = { b "File token (len=%lu) = %s\n", b 0 }
+data $file_token_fmt = { b "File token (len=%lu; type=%u) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
@@ -36,10 +36,11 @@ function w $parse_file(l %fh) {
     %token =l alloc1 %_max_token_len
 @tokenize
     %len =l call $get_token(l %type, l %token, l %_max_token_len, l %fh)
+    %token_t =w loadub %type
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @exit, @process_token
 @process_token
-    call $printf(l $file_token_fmt, ..., w %len, l %token)
+    call $printf(l $file_token_fmt, ..., w %len, w %token_t, l %token)
     jmp @tokenize
 @exit
     ret 0
