@@ -7,7 +7,7 @@ data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 
 
-function l $get_token(l %buffer, l %size, l %capacity, l %fh)
+function l $get_token(l %buffer, l %capacity, l %fh)
 {
 @start
     %len =l copy 0
@@ -33,7 +33,7 @@ function w $parse_file(l %fh) {
 @start
     %token =l alloc1 33
 @tokenize
-    %len =l call $get_token(l %token, l 1, l 33, l %fh)
+    %len =l call $get_token(l %token, l 33, l %fh)
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @exit, @print_token
 @print_token
