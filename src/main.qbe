@@ -1,6 +1,7 @@
 data $argc_fmt = { b "\nNumber of arguments = %u\n", b 0 }
 data $file_name_fmt = { b "File name = %s\n\n", b 0 }
 data $file_token_fmt = { b "File token (len=%lu; type=%u) = %s\n", b 0 }
+data $ch_fmt = { b "character = %c\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
@@ -16,15 +17,23 @@ data $div_op = { b 47, b 0 }
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
 {
 @start
+    # load constants
+    %_add_op =w loadub $add_op
+    %_sub_op =w loadub $sub_op
+    %_mul_op =w loadub $mul_op
+    %_div_op =w loadub $div_op
     %_capacity =l sub %capacity, 1
-    %_num_lit_dtype =w loadub $num_literal_dtype
-    %_func_dtype =w loadub $func_dtype
-    %_arith_op_dtype =w loadub $arith
     %len =l copy 0
 @read_dtype
     %ch =w call $fgetc(l %fh)
-    %is_num =w ceqw %ch, 
-@get_char
+    storeb %ch, %type
+    %is_add_op =w ceqw %ch, %_add_op
+    %is_sub_op =w ceqw %ch, %_sub_op
+    %is_mul_op =w ceqw %ch, %_mul_op
+    %is_div_op =w ceqw %ch, %_div_op
+    %is_op =w or %is_add_op, %is_sub_op, %is_mul_op, %is_div_op
+    jnz %is_op, @handle_op_read, @get_ch
+@get_ch
     %ch =w call $fgetc(l %fh)
     %ch_cmp_res1 =w culew %ch, 32  # compare with ASCII value for space character
     %ch_cmp_res2 =w cugew %ch, 127  # compare with ASCII value for DEL character
@@ -35,7 +44,9 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
     %len =l add %len, 1
     %buffer =l add %buffer, 1
     %at_cap =w ceql %len, %_capacity
-    jnz %at_cap, @exit, @get_char
+    jnz %at_cap, @exit, @get_ch
+@handle_op_read
+    %len =l add %len, 1
 @exit
     storeb 0, %buffer
     ret %len
