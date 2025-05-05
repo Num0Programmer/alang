@@ -4,6 +4,10 @@ data $file_token_fmt = { b "File token (len=%lu; type=%u) = %s\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
 data $read_mode = { b "r", b 0 }
 data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
+# data types and operation defs
+data $num_literal_t = { b 35, b 0 }  # pound (#)
+data $str_literal_t = { b 34, b 0 }  # double quote (")
+data $ch_literal_t = { b 39, b 0 }   # single quote (')
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
