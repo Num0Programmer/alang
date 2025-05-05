@@ -3,7 +3,6 @@ data $file_name_fmt = { b "File name = %s\n\n", b 0 }
 data $file_token_fmt = { b "File token (len=%lu; type=%u) = %s\n", b 0 }
 data $ch_fmt = { b "character = %c\n", b 0 }
 data $err_open_file = { b "Error: could not open specified file!\n", b 0 }
-data $read_mode = { b "r", b 0 }
 data $max_token_len = { l 33, b 0 }  # extra byte for null terminator
 # data types and operation defs
 data $num_literal_dtype = { b 35, b 0 }  # pound (#) - real number
@@ -12,6 +11,12 @@ data $add_op = { b 43, b 0 }
 data $sub_op = { b 45, b 0 }
 data $mul_op = { b 42, b 0 }
 data $div_op = { b 47, b 0 }
+# file open modes
+data $read_mode = { b "r", b 0 }
+data $write_mode = { b "w", b 0 }
+# QBE main func preamble
+data $def_main_func = { b "function w $main() {\n", b 0 }
+data $end_main_func = { b "\tret 0\n}", b 0 }
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
@@ -53,13 +58,15 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
 }
 
 
-function w $parse_file(l %fh) {
+function w $compile(l %dst_fh, l %src_fh) {
 @start
     %type =l alloc1 1
     %_max_token_len =l loadl $max_token_len
     %token =l alloc1 %_max_token_len
+@preamble
+    call $fwrite()
 @tokenize
-    %len =l call $get_token(l %type, l %token, l %_max_token_len, l %fh)
+    %len =l call $get_token(l %type, l %token, l %_max_token_len, l %src_fh)
     %token_t =w loadub %type
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @exit, @process_token
@@ -75,15 +82,25 @@ export function w $main(l %argc, l %argv) {
 @start
     call $printf(l $argc_fmt, ..., l %argc)
     %argv =l add %argv, 8
-    %file_name =l loadl %argv
-    call $printf(l $file_name_fmt, ..., l %file_name)
-    %fh =l call $fopen(l %file_name, l $read_mode)
-    jnz %fh, @fopen_success, @fopen_failure
-@fopen_success
-    call $parse_file(l %fh)
-    call $fclose(l %fh)
+    %src_file_name =l loadl %argv
+    # call $printf(l $file_name_fmt, ..., l %src_file_name)
+    %src_fh =l call $fopen(l %src_file_name, l $read_mode)
+    %argv =l add %argv, 8
+    %dst_file_name =l loadl %argv
+    %dst_fh =l call $fopen(l %dst_file_name, l $write_mode)
+    jnz %src_fh, @open_src_success, @open_src_failure
+@open_src_success
+    jnz %dst_fh, @open_dst_success, @open_dst_failure
+@open_dst_success
+    call $compile(l %dst_fh, l %src_fh)
+    call $fclose(l %dst_fh)
+    jmp @close_src_file
+@open_dst_failure
+    call $printf(l $err_open_file, ...)
+@close_src_file
+    call $fclose(l %src_fh)
     jmp @exit
-@fopen_failure
+@open_src_failure
     call $printf(l $err_open_file, ...)
 @exit
     ret 0
