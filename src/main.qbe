@@ -63,16 +63,18 @@ function w $compile(l %dst_fh, l %src_fh) {
     %type =l alloc1 1
     %_max_token_len =l loadl $max_token_len
     %token =l alloc1 %_max_token_len
-@preamble
-    call $fwrite()
+@begin_program
+    call $fprintf(l %dst_fh, l $def_main_func, ...)
 @tokenize
     %len =l call $get_token(l %type, l %token, l %_max_token_len, l %src_fh)
     %token_t =w loadub %type
     %cmp_res =w ceqw %len, 0
-    jnz %cmp_res, @exit, @process_token
+    jnz %cmp_res, @end_program, @process_token
 @process_token
     call $printf(l $file_token_fmt, ..., w %len, w %token_t, l %token)
     jmp @tokenize
+@end_program
+    call $fprintf(l %dst_fh, l $end_main_func, ...)
 @exit
     ret 0
 }
