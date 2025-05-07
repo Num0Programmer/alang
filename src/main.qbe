@@ -18,7 +18,8 @@ data $write_mode = { b "w", b 0 }
 data $def_main_func = { b "export function w $main() {\n@start\n", b 0 }
 data $end_main_func = { b "\tret 0\n}", b 0 }
 # QBE variable definitions and arithmetic operations
-data $init_wvar = { b "\t%cC%lu =w copy %s\n", b 0 }
+data $init_wvar_fmt = { b "\t%cC%lu =w copy %s\n", b 0 }
+data $wadd_fmt = { b "\t%cC%lu =w add %cC%lu, %cC%lu\n", b 0 }
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
@@ -75,13 +76,19 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     %res_token =w ceqw %type, %_func
     jnz %res_token, @is_func, @try_add_op
 @try_add_op
-    jmp @is_add_op
+    %res_token =w ceqw %type, %_add_op
+    jnz %res_token, @is_add_op, @try_sub_op
+@try_sub_op
+    jmp @is_sub_op
 @is_num_literal
-    call $fprintf(l %dst_fh, l $init_wvar, ..., w 37, l %ntoks, l %token)
+    call $fprintf(l %dst_fh, l $init_wvar_fmt, ..., w 37, l %ntoks, l %token)
     jmp @exit
 @is_func
     jmp @exit
 @is_add_op
+    %fopand =l add %ntoks, 2
+    %lopand =l add %ntoks, 1
+    call $fprintf(l %dst_fh, l $wadd_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @is_sub_op
     jmp @exit
