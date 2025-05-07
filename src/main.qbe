@@ -15,11 +15,13 @@ data $div_op = { b 47, b 0 }
 data $read_mode = { b "r", b 0 }
 data $write_mode = { b "w", b 0 }
 # QBE main func preamble
+data $wfmt = { b "data $fmt = { b \"%cd\", b 0 }\n"}
 data $def_main_func = { b "export function w $main() {\n@start\n", b 0 }
 data $end_main_func = { b "\tret 0\n}", b 0 }
 # QBE variable definitions and arithmetic operations
 data $init_wvar_fmt = { b "\t%cC%lu =w copy %s\n", b 0 }
 data $wadd_fmt = { b "\t%cC%lu =w add %cC%lu, %cC%lu\n", b 0 }
+data $wprint_fmt = { b "\tcall $printf(l %fmt, ..., %cC%lu)\n"}
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
@@ -84,6 +86,7 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     call $fprintf(l %dst_fh, l $init_wvar_fmt, ..., w 37, l %ntoks, l %token)
     jmp @exit
 @is_func
+    call $fprintf(l %dst_fh, l $wprint_fmt, ..., w 37, l %ntoks)
     jmp @exit
 @is_add_op
     %fopand =l sub %ntoks, 2
@@ -108,6 +111,7 @@ function w $compile(l %dst_fh, l %src_fh) {
     %type =l alloc1 1
     %token =l alloc1 %_max_token_len
 @begin_program
+    call $fprintf(l %dst_fh, l $wfmt, ..., w 37)
     call $fprintf(l %dst_fh, l $def_main_func, ...)
 @tokenize
     %len =l call $get_token(l %type, l %token, l %_max_token_len, l %src_fh)
