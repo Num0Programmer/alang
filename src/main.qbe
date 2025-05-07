@@ -15,7 +15,7 @@ data $div_op = { b 47, b 0 }
 data $read_mode = { b "r", b 0 }
 data $write_mode = { b "w", b 0 }
 # QBE main func preamble
-data $def_main_func = { b "function w $main() {\n", b 0 }
+data $def_main_func = { b "export function w $main() {\n@start\n", b 0 }
 data $end_main_func = { b "\tret 0\n}", b 0 }
 
 
