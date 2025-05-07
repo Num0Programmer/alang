@@ -17,6 +17,8 @@ data $write_mode = { b "w", b 0 }
 # QBE main func preamble
 data $def_main_func = { b "export function w $main() {\n@start\n", b 0 }
 data $end_main_func = { b "\tret 0\n}", b 0 }
+# QBE variable definitions and arithmetic operations
+data $init_wvar = { b "\t%cC%lu =w copy %lu\n", b 0 }
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
@@ -58,9 +60,20 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
 }
 
 
-function w $process_token(l %dst_fh, w %type, l %token) {
+function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
 @start
+    %_num_lit =w loadub $num_literal_dtype
+    %_func =w loadub $func
+    %_add_op =w loadub $add_op
+    %_sub_op =w loadub $sub_op
+    %_mul_op =w loadub $mul_op
+    %_div_op =w loadub $div_op
+@try_num_literal
+    %res_token =w ceqw %type, %_num_lit
+    jnz %res_token, @is_num_literal, @try_func
+@try_func
 @is_num_literal
+    call $fprintf(l %dst_fh, l $init_wvar, ..., w 37, l %ntoks, l %token)
 @is_func
 @is_add_op
 @is_sub_op
@@ -73,8 +86,9 @@ function w $process_token(l %dst_fh, w %type, l %token) {
 
 function w $compile(l %dst_fh, l %src_fh) {
 @start
-    %type =l alloc1 1
     %_max_token_len =l loadl $max_token_len
+    %ntoks =l copy 0
+    %type =l alloc1 1
     %token =l alloc1 %_max_token_len
 @begin_program
     call $fprintf(l %dst_fh, l $def_main_func, ...)
@@ -84,7 +98,8 @@ function w $compile(l %dst_fh, l %src_fh) {
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @end_program, @process_token
 @process_token
-    call $process_token(l %dst_fh, w %token_t, l %token)
+    call $process_token(l %dst_fh, w %token_t, l %token, l %ntoks)
+    %ntoks =l add %ntoks, 1
     jmp @tokenize
 @end_program
     call $fprintf(l %dst_fh, l $end_main_func, ...)
