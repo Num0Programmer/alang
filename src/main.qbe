@@ -86,8 +86,8 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
 @is_func
     jmp @exit
 @is_add_op
-    %fopand =l add %ntoks, 2
-    %lopand =l add %ntoks, 1
+    %fopand =l sub %ntoks, 2
+    %lopand =l sub %ntoks, 1
     call $fprintf(l %dst_fh, l $wadd_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @is_sub_op
