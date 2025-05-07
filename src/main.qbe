@@ -58,6 +58,19 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
 }
 
 
+function w $process_token(l %dst_fh, w %type, l %token) {
+@start
+@is_num_literal
+@is_func
+@is_add_op
+@is_sub_op
+@is_mul_op
+@is_div_op
+@exit
+    ret 0
+}
+
+
 function w $compile(l %dst_fh, l %src_fh) {
 @start
     %type =l alloc1 1
@@ -71,6 +84,7 @@ function w $compile(l %dst_fh, l %src_fh) {
     %cmp_res =w ceqw %len, 0
     jnz %cmp_res, @end_program, @process_token
 @process_token
+    call $process_token(l %dst_fh, w %token_t, l %token)
     jmp @tokenize
 @end_program
     call $fprintf(l %dst_fh, l $end_main_func, ...)
