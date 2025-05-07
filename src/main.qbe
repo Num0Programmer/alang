@@ -72,13 +72,23 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     %res_token =w ceqw %type, %_num_lit
     jnz %res_token, @is_num_literal, @try_func
 @try_func
+    %res_token =w ceqw %type, %_func
+    jnz %res_token, @is_func, @try_add_op
+@try_add_op
+    jmp @is_add_op
 @is_num_literal
     call $fprintf(l %dst_fh, l $init_wvar, ..., w 37, l %ntoks, l %token)
+    jmp @exit
 @is_func
+    jmp @exit
 @is_add_op
+    jmp @exit
 @is_sub_op
+    jmp @exit
 @is_mul_op
+    jmp @exit
 @is_div_op
+    jmp @exit
 @exit
     ret 0
 }
