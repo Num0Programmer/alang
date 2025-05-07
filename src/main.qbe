@@ -21,7 +21,7 @@ data $end_main_func = { b "\tret 0\n}", b 0 }
 # QBE variable definitions and arithmetic operations
 data $init_wvar_fmt = { b "\t%cC%lu =w copy %s\n", b 0 }
 data $wadd_fmt = { b "\t%cC%lu =w add %cC%lu, %cC%lu\n", b 0 }
-data $wprint_fmt = { b "\tcall $printf(l %fmt, ..., %cC%lu)\n"}
+data $wprint_fmt = { b "\tcall $printf(l $fmt, ..., w %cC%lu)\n"}
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
@@ -57,6 +57,7 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
     jnz %at_cap, @exit, @get_ch
 @handle_op_read
     %len =l add %len, 1
+    jmp @get_ch
 @exit
     storeb 0, %buffer
     ret %len
@@ -86,7 +87,8 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     call $fprintf(l %dst_fh, l $init_wvar_fmt, ..., w 37, l %ntoks, l %token)
     jmp @exit
 @is_func
-    call $fprintf(l %dst_fh, l $wprint_fmt, ..., w 37, l %ntoks)
+    %lvar =l sub %ntoks, 1
+    call $fprintf(l %dst_fh, l $wprint_fmt, ..., w 37, l %lvar)
     jmp @exit
 @is_add_op
     %fopand =l sub %ntoks, 2
