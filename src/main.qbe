@@ -18,7 +18,7 @@ data $write_mode = { b "w", b 0 }
 data $def_main_func = { b "export function w $main() {\n@start\n", b 0 }
 data $end_main_func = { b "\tret 0\n}", b 0 }
 # QBE variable definitions and arithmetic operations
-data $init_wvar = { b "\t%cC%lu =w copy %lu\n", b 0 }
+data $init_wvar = { b "\t%cC%lu =w copy %s\n", b 0 }
 
 
 function l $get_token(l %type, l %buffer, l %capacity, l %fh)
