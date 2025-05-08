@@ -1,5 +1,5 @@
 SRC=./src
-BIN=test
+BIN=alc
 
 
 all: main.s
