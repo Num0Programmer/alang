@@ -33,14 +33,14 @@ Now that the compiler is built, you can compile and run your own Alang programs.
 check out examples in the 'examples/' directory. Try building and running the addition example by
 running the following:
 ```sh
-$ ./alc examples/add.a add.qbe
-$ qbe add.qbe -o add.s
-$ cc add.s -o add
-$ ./add
+./alc examples/add.a add.qbe
+qbe add.qbe -o add.s
+cc add.s -o add
+./add
 ```
 The result should be:
 ```sh
-$ 19
+19
 ```
 
 
