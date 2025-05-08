@@ -1,3 +1,9 @@
 # Arithmetic Language (alang)
 
-Simple language. Not fully realized. It'll be whatever I say it'll be.
+Simple language for evaluating expressions. Features:
+(1) Addition
+(2) Subtraction
+(3) Multiplication
+(4) Division
+
+NOTE: the above operations can only be carried out on integers of size 'word'
