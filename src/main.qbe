@@ -23,6 +23,7 @@ data $init_wvar_fmt = { b "\t%cC%lu =w copy %s\n", b 0 }
 data $wadd_fmt = { b "\t%cC%lu =w add %cC%lu, %cC%lu\n", b 0 }
 data $wsub_fmt = { b "\t%cC%lu =w sub %cC%lu, %cC%lu\n", b 0 }
 data $wmul_fmt = { b "\t%cC%lu =w mul %cC%lu, %cC%lu\n", b 0 }
+data $wdiv_fmt = { b "\t%cC%lu =w div %cC%lu, %cC%lu\n", b 0 }
 data $wprint_fmt = { b "\tcall $printf(l $fmt, ..., w %cC%lu)\n"}
 
 
@@ -92,7 +93,8 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     %res_token =w ceqw %type, %_mul_op
     jnz %res_token, @is_mul_op, @try_div_op
 @try_div_op
-    jmp @is_div_op
+    %res_token =w ceqw %type, %_div_op
+    jnz %res_token, @is_div_op, @exit
 
 @is_num_literal
     call $fprintf(l %dst_fh, l $init_wvar_fmt, ..., w 37, l %ntoks, l %token)
@@ -117,6 +119,9 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     call $fprintf(l %dst_fh, l $wmul_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @is_div_op
+    %fopand =l sub %ntoks, 2
+    %lopand =l sub %ntoks, 1
+    call $fprintf(l %dst_fh, l $wdiv_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @exit
     ret 0
