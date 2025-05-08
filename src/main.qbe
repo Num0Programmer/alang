@@ -22,6 +22,7 @@ data $end_main_func = { b "\tret 0\n}", b 0 }
 data $init_wvar_fmt = { b "\t%cC%lu =w copy %s\n", b 0 }
 data $wadd_fmt = { b "\t%cC%lu =w add %cC%lu, %cC%lu\n", b 0 }
 data $wsub_fmt = { b "\t%cC%lu =w sub %cC%lu, %cC%lu\n", b 0 }
+data $wmul_fmt = { b "\t%cC%lu =w mul %cC%lu, %cC%lu\n", b 0 }
 data $wprint_fmt = { b "\tcall $printf(l $fmt, ..., w %cC%lu)\n"}
 
 
@@ -43,6 +44,8 @@ function l $get_token(l %type, l %buffer, l %capacity, l %fh)
     %is_mul_op =w ceqw %ch, %_mul_op
     %is_div_op =w ceqw %ch, %_div_op
     %is_op =w or %is_add_op, %is_sub_op, %is_mul_op, %is_div_op
+    %is_op =w or %is_op, %is_mul_op
+    %is_op =w or %is_op, %is_div_op
     jnz %is_op, @handle_op_read, @get_ch
 @get_ch
     %ch =w call $fgetc(l %fh)
@@ -86,7 +89,8 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     %res_token =w ceqw %type, %_sub_op
     jnz %res_token, @is_sub_op, @try_mul_op
 @try_mul_op
-    jmp @is_mul_op
+    %res_token =w ceqw %type, %_mul_op
+    jnz %res_token, @is_mul_op, @try_div_op
 @try_div_op
     jmp @is_div_op
 
@@ -108,6 +112,9 @@ function w $process_token(l %dst_fh, w %type, l %token, l %ntoks) {
     call $fprintf(l %dst_fh, l $wsub_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @is_mul_op
+    %fopand =l sub %ntoks, 2
+    %lopand =l sub %ntoks, 1
+    call $fprintf(l %dst_fh, l $wmul_fmt, ..., w 37, l %ntoks, w 37, l %fopand, w 37, l %lopand)
     jmp @exit
 @is_div_op
     jmp @exit
