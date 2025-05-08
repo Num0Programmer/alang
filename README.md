@@ -12,7 +12,7 @@ NOTE: the above operations can only be carried out on integers of size 'word'
 ## Installation
 Please be sure you have a C compiler installed on your system. On linux, this can be obtained
 through your distribution's package manager. On MacOS, this can be installed through
-[Homebrew](https://brew.sh/). If you're on Window - good luck sucker.
+[Homebrew](https://brew.sh/). If you're on Windows, good luck sucker.
 
 ## QBE
 To be able to compile your programs, you will need to
